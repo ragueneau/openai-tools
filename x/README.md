@@ -44,7 +44,7 @@ x -h
     Display the usage of the script
 ```
 ```
--s --search
+-f --find
     Search the history for a specific command
 ```
 ```
