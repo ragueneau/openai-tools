@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION=1.0.5
+VERSION=1.0.6
 # Name: x
 # Description: OpenAI API for bash: Translate a command in natural language into a bash one-liner.
 #              Become a linux guru in no time! (or at least a little bit better)
@@ -107,6 +107,9 @@ x_get_opts() {
     # Usage: x_get_opts "$@"
     # Description: Get the options
 
+    # if the first argument is not an option, then it's a command
+    if [[ $1 != -* ]]; then;return;fi
+
     while [[ $# -gt 0 ]]; do
         key="$1"
         case $key in
@@ -152,6 +155,11 @@ x_get_opts() {
         shift
     done
 }
+
+# x_execute_command() {
+
+# }
+
 
 x_help() {
     # Version 1.0.5
