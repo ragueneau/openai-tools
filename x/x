@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-VERSION=1.0.4
+VERSION=1.0.5
 # Name: x
 # Description: OpenAI API for bash: Translate a command in natural language into a bash one-liner.
+#              Become a linux guru in no time! (or at least a little bit better)
 # Author: Jocelyn Lecours
 #
 # Usage: x <command>
@@ -31,9 +32,21 @@ fi
 ###################################################################################
 ## Main ##
 main() {
+    # Version 1.0.5
+    # Usage: main "$@"
+    # Description: Main function
+
+    local model="text-davinci-002"
+    local temperature=0.7
+    local max_tokens=60
+
     local tmp_output_file=$(mktemp /tmp/x.XXXXXX)
+
     local x_history_file=~/.x
     touch $x_history_file 2> /dev/null
+
+    # get the options
+    x_get_opts "$@"
 
     local question=$@
     while [ -z "$question" ]; do read -p "What do you want to do? " question;done
@@ -44,7 +57,7 @@ main() {
     [[ $question != *"."$ ]] && prompt="$prompt."
 
     curl -q -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $OPENAI_API_KEY" \
-        -d '{"model": "text-davinci-002", "prompt": "'"$prompt"'", "temperature": 0.7, "max_tokens": 60}' \
+        -d '{"model": "'$model'", "prompt": "'"$prompt"'", "temperature": '$temperature', "max_tokens": '$max_tokens'}' \
         -o $tmp_output_file https://api.openai.com/v1/completions > /dev/null 2>&1
 
     # add the command to the x history
@@ -58,10 +71,10 @@ main() {
     # clean up the $command to make sure it's safe to execute
     command=$(echo "$command" | sed 's/"/\"/g'|sed "s/'/\'/"|tr -d '\n')
 
-    read -p "Execute or retry? [y/r/N] " -n 1 -r
+    read -p "[E]xecute or [r]etry? [e/r/N] " -n 1 -r
     echo
     case $REPLY in
-        y)
+        e)
             # excute the command in a new shell
             bash -c "$command"
 
@@ -87,6 +100,276 @@ main() {
 
     rm $tmp_output_file
     exit $?
+}
+
+x_get_opts() {
+    # Version 1.0.5
+    # Usage: x_get_opts "$@"
+    # Description: Get the options
+
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            -h|--help)
+                x_help
+                exit 0
+                ;;
+            -v|--version)
+                x_show_version
+                exit 0
+                ;;
+            -c|--clear)
+                x_clear_history
+                exit 0
+                ;;
+            -d|--display)
+                x_show_history
+                exit 0
+                ;;
+            -f|--find|--search)
+                shift
+                x_search_history $@
+                exit 0
+                ;;
+            -r|raw)
+                x_show_raw_stats
+                exit 0
+                ;;
+            -u|--usage)
+                x_show_token_usage
+                exit 0
+                ;;
+            -t|--total)
+                x_show_total_token
+                exit 0
+                ;;
+            *)
+                echo "Unknown option: $key"
+                x_help
+                exit 1
+                ;;
+        esac
+        shift
+    done
+}
+
+x_help() {
+    # Version 1.0.5
+    # Usage: x_help
+    # Description: Show the help message
+
+    echo "Usage: x <command>"
+    echo "Example: x create a ssh key pair named test13 in /tmp with no password"
+    echo "         x find the files over 1go in /home. use sudo"
+    echo "         x zip all the files in /tmp older than 1 day and send it by email to you@domain.com"
+    echo
+    echo "Options:"
+    echo "  -h, --help      Show this help message and exit"
+    echo "  -v, --version   Show the version number and exit"
+    echo "  -c, --clear     Clear the history"
+    echo "  -d, --display   Display the history"
+    echo "  -f, --find      Search the history"
+    echo "  -u, --usage     Show the token usage"
+    echo "  -t, --total     Show the total token"
+    echo
+}
+
+x_clear_history() {
+    # Version 1.0.5
+    # Usage: x_clear_history
+    # Description: Clear the x history
+
+    local x_history_file=~/.x
+    echo -n "" > $x_history_file
+}
+
+x_show_history() {
+    # Version 1.0.5
+    # Usage: x_show_history
+    # Description: Show the x history
+
+    local x_history_file=~/.x
+    cat $x_history_file
+}
+
+x_show_version() {
+    # Version 1.0.5
+    # Usage: x_show_version
+    # Description: Show the version of x
+
+    echo $VERSION
+}
+
+x_search_history() {
+    # Version 1.0.5
+    # Usage: x_search_history <search term>
+    # Description: Search the x history
+
+    local x_history_file=~/.x
+    local search_term=$1
+    shift
+    local search_options=$@
+
+    grep -i "$search_term" $x_history_file $search_options|jq -r '.choices[0].text'|sort -r |uniq
+}
+
+x_show_total_token() {
+    # Version 1.0.5
+    # Usage: x_show_total_token
+    # Description: Show the total number of tokens used in the x history
+
+    local total_tokens=$(x_get_tokens_stats|jq '.total_tokens'|tr -d '"')
+    local total_requests=$(x_get_tokens_stats|jq '.total_requests'|tr -d '"')
+    echo "$total_tokens tokens in $total_requests requests"
+}
+
+x_show_token_usage() {
+    # Version 1.0.5
+    # Usage: x_show_token_usage
+    # Description: Show the token stats (total, average, min, max) for the x history
+
+    local stats=$(x_get_tokens_stats)
+
+    echo -e "\e[1;37mTotal requests\e[0m: $(echo $stats|jq '.total_requests'|tr -d '"')"
+    echo -e "\e[4;1;34mPrompt\e[0m:"
+    echo -e "\e[1;37mTotal tokens\e[0m: $(echo $stats|jq '.prompt.total_tokens'|tr -d '"')"
+    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.prompt.average_tokens'|tr -d '"')"
+    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.prompt.min_tokens'|tr -d '"')"
+    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.prompt.max_tokens'|tr -d '"')"
+    echo -e "\e[4;1;34mCompletion\e[0m:"
+    echo -e "\e[1;37mTotal tokens\e[0m: $(echo $stats|jq '.completion.total_tokens'|tr -d '"')"
+    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.completion.average_tokens'|tr -d '"')"
+    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.completion.min_tokens'|tr -d '"')"
+    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.completion.max_tokens'|tr -d '"')"
+    echo -e "\e[4;1;34mTotal\e[0m:"
+    echo -e "\e[1;37mTotal tokens used\e[0m: $(echo $stats|jq '.total.total_tokens'|tr -d '"')"
+    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.total.average_tokens'|tr -d '"')"
+    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.total.min_tokens'|tr -d '"')"
+    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.total.max_tokens'|tr -d '"')"
+}
+
+x_show_raw_stats() {
+    # Version 1.0.5
+    # Usage: x_show_raw_stats
+    # Description: Show the raw stats for the x history
+
+    x_get_tokens_stats
+}
+
+x_get_tokens_stats() {
+    # Version 1.0.5
+    # Usage: x_show_token_usage
+    # Description: Get the token stats (total, average, min, max) for the x history
+
+    local x_history_file=~/.x
+    # Total
+    local total_tokens=0
+    local min_tokens=0
+    local max_tokens=0
+    local average_tokens=0
+    # prompt
+    local total_prompt_tokens=0
+    local min_prompt_tokens=0
+    local max_prompt_tokens=0
+    local average_prompt_tokens=0
+    # completion
+    local total_completion_tokens=0
+    local min_completion_tokens=0
+    local max_completion_tokens=0
+    local average_completion_tokens=0
+    # total request
+    local nb_line=0
+
+    # Get tje statistics of the x history based on the example
+    while read -r line; do
+        nb_line=$((nb_line + 1))
+
+        # Total
+        local r_total_tokens=$(echo $line | jq -r '.usage.total_tokens')
+        total_tokens=$((total_tokens + r_total_tokens))
+
+        if [[ $min_tokens -eq 0 ]]; then
+            min_tokens=$r_total_tokens
+        fi
+        if [[ $r_total_tokens -lt $min_tokens ]]; then
+            min_tokens=$r_total_tokens
+        fi
+        if [[ $r_total_tokens -gt $max_tokens ]]; then
+            max_tokens=$r_total_tokens
+        fi
+
+        # prompt
+        local r_prompt_tokens=$(echo $line | jq -r '.usage.prompt_tokens')
+        total_prompt_tokens=$((total_prompt_tokens + r_prompt_tokens))
+
+        if [[ $min_prompt_tokens -eq 0 ]]; then
+            min_prompt_tokens=$r_prompt_tokens
+        fi
+        if [[ $r_prompt_tokens -lt $min_prompt_tokens ]]; then
+            min_prompt_tokens=$r_prompt_tokens
+        fi
+        if [[ $r_prompt_tokens -gt $max_prompt_tokens ]]; then
+            max_prompt_tokens=$r_prompt_tokens
+        fi
+
+        # completion
+        local r_completion_tokens=$(echo $line | jq -r '.usage.completion_tokens')
+        total_completion_tokens=$((total_completion_tokens + r_completion_tokens))
+
+        if [[ $min_completion_tokens -eq 0 ]]; then
+            min_completion_tokens=$r_completion_tokens
+        fi
+        if [[ $r_completion_tokens -lt $min_completion_tokens ]]; then
+            min_completion_tokens=$r_completion_tokens
+        fi
+        if [[ $r_completion_tokens -gt $max_completion_tokens ]]; then
+            max_completion_tokens=$r_completion_tokens
+        fi
+
+    done < $x_history_file
+
+    average_tokens=$((total_tokens / nb_line))
+    average_prompt_tokens=$((total_prompt_tokens / nb_line))
+    average_completion_tokens=$((total_completion_tokens / nb_line))
+
+    stats=$( jq -n \
+        --arg total_requests "$nb_line" \
+        --arg total_tokens "$total_tokens" \
+        --arg average_tokens "$average_tokens" \
+        --arg min_tokens "$min_tokens" \
+        --arg max_tokens "$max_tokens" \
+        --arg total_prompt_tokens "$total_prompt_tokens" \
+        --arg min_prompt_tokens "$min_prompt_tokens" \
+        --arg max_prompt_tokens "$max_prompt_tokens" \
+        --arg total_completion_tokens "$total_completion_tokens" \
+        --arg min_completion_tokens "$min_completion_tokens" \
+        --arg max_completion_tokens "$max_completion_tokens" \
+        --arg prompt_average_tokens "$average_prompt_tokens" \
+        --arg completion_average_tokens "$average_completion_tokens" \
+        '{
+            "total_requests": $total_requests,
+            "total": {
+                "total_tokens": $total_tokens,
+                "average_tokens": $average_tokens,
+                "min_tokens": $min_tokens,
+                "max_tokens": $max_tokens
+            },
+            "prompt": {
+                "total_tokens": $total_prompt_tokens,
+                "average_tokens": $prompt_average_tokens,
+                "min_tokens": $min_prompt_tokens,
+                "max_tokens": $max_prompt_tokens
+            },
+            "completion": {
+                "total_tokens": $total_completion_tokens,
+                "average_tokens": $completion_average_tokens,
+                "min_tokens": $min_completion_tokens,
+                "max_tokens": $max_completion_tokens
+            }
+
+
+        }' )
+    echo $stats
 }
 
 ############################################################################################################
