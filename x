@@ -2,7 +2,7 @@
 VERSION=1.0.3
 # Name: x
 # Description: OpenAI API for bash: Translate a command in natural language into a bash one-liner.
-# Author: Jocelyn Lecours
+# Author: Jocelyn Lecours (jocelyn@coeptix.com)
 #
 # Usage: x <command>
 #
@@ -11,6 +11,22 @@ VERSION=1.0.3
 #          x zip all the files in /tmp older than 1 day and send it by email to test@test.com
 #
 ###################################################################################
+
+# check if jq is installed
+if ! command -v jq &> /dev/null; then
+    echo "jq could not be found. Please install it."
+    exit 1
+fi
+# check if curl is installed
+if ! command -v curl &> /dev/null; then
+    echo "curl could not be found. Please install it."
+    exit 1
+fi
+# check if OPENAI_API_KEY is set
+if [ -z "$OPENAI_API_KEY" ]; then
+    echo "OPENAI_API_KEY is not set. Please set it."
+    exit 1
+fi
 
 ###################################################################################
 ## Main ##
