@@ -108,7 +108,7 @@ x_get_opts() {
     # Description: Get the options
 
     # if the first argument is not an option, then it's a command
-    if [[ $1 != -* ]]; then;return;fi
+    if [[ $1 != -* ]]; then return;fi
 
     while [[ $# -gt 0 ]]; do
         key="$1"
