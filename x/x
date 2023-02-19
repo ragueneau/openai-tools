@@ -38,7 +38,7 @@ main() {
     local question=$@
     while [ -z "$question" ]; do read -p "What do you want to do? " question;done
 
-    local prompt="System information: ($lsb_release -a).\n Translate this into a Bash one-liner: $question"
+    local prompt="System information: $(lsb_release -a).\n Translate this into a Bash one-liner: $question"
 
     # make sure the question ends with a dot
     [[ $question != *"." ]] && prompt="$prompt."
