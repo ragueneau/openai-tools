@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION=1.0.3
+VERSION=1.0.4
 # Name: x
 # Description: OpenAI API for bash: Translate a command in natural language into a bash one-liner.
 # Author: Jocelyn Lecours
@@ -47,37 +47,35 @@ main() {
         -d '{"model": "text-davinci-002", "prompt": "'"$prompt"'", "temperature": 0.7, "max_tokens": 60}' \
         -o $tmp_output_file https://api.openai.com/v1/completions > /dev/null 2>&1
 
+    # add the command to the x history
+    cat $tmp_output_file >> $x_history_file
+
     local command=$(cat $tmp_output_file | jq -r '.choices[0].text')
 
+    # show the command
     echo -e "\e[1;37m"${command}"\e[0m"
 
     # clean up the $command to make sure it's safe to execute
-    command=$(echo "$command" | sed 's/"/\"/g'|sed "s/'/\'/")
+    command=$(echo "$command" | sed 's/"/\"/g'|sed "s/'/\'/"|tr -d '\n')
 
     read -p "Execute or retry? [y/r/N] " -n 1 -r
     echo
     case $REPLY in
-        y)  echo "Executing..."
-            history -a
-
+        y)
             # excute the command in a new shell
             bash -c "$command"
 
             # if the command was successful, add it to the history
             # if there are timestamps in the history, add one before the command
-            if [ $? -eq 0 ]; then
-                if grep -q "^#" ~/.bash_history; then
-                    echo -e "#$(date +%s)\n${command}" >> ~/.bash_history
-                else
-                    echo -e "${command}" >> ~/.bash_history
-                fi
-            fi
-            history -n
-            history -a
 
-            command=$(echo "$command" | sed 's/\n//g')
-            # add the command to the x history
-            cat $tmp_output_file >> $x_history_file
+            if [ $? -eq 0 ]; then
+               if grep -q "^#" ~/.bash_history; then
+                   echo -e "#$(date +%s)\n${command}" >> ~/.bash_history
+               else
+                   echo "${command}" >> ~/.bash_history
+               fi
+            fi
+
             ;;
         r)  echo "Retrying..."
             main "$@"
