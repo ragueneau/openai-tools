@@ -41,7 +41,7 @@ main() {
     local prompt="Translate this into a Bash one-liner: $question"
 
     # make sure the question ends with a dot
-    [[ $question != *"." ]] && prompt="$prompt."
+    [[ $question != *"."$ ]] && prompt="$prompt."
 
     curl -q -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $OPENAI_API_KEY" \
         -d '{"model": "text-davinci-002", "prompt": "'"$prompt"'", "temperature": 0.7, "max_tokens": 60}' \
