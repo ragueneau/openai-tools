@@ -1,4 +1,4 @@
-#x
+# x
 This is a Bash script to translate commands written in natural language into a Bash one-liner.
 
 ## Description
