@@ -19,15 +19,15 @@ x < command >
 ```
 ### History
 The history of the commands is stored in the file ~/.x_history. You can use the following command to display the history:
-```bash
+```
 x -h
 ```
 ### Options
-```bash
+```
 -e, --execute
     Execute the command without prompting
 ```
-```bash
+```
 -h, --history
     Display the history of the commands
 ```
