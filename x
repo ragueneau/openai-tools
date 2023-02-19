@@ -2,7 +2,7 @@
 VERSION=1.0.3
 # Name: x
 # Description: OpenAI API for bash: Translate a command in natural language into a bash one-liner.
-# Author: Jocelyn Lecours (jocelyn@coeptix.com)
+# Author: Jocelyn Lecours
 #
 # Usage: x <command>
 #
