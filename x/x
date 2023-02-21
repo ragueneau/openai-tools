@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION=1.0.7
+VERSION=1.0.8
 # Name: x
 # Description: OpenAI API for bash: Translate a command in natural language into a bash one-liner.
 #              Become a linux guru in no time! (or at least a little bit better)
@@ -34,7 +34,7 @@ export model="text-davinci-002"
 export temperature=0.7
 export max_tokens=60
 
-export tmp_output_file=$(mktemp /tmp/x.XXXXXX)
+export tmp_output_file=$(mktemp -p /tmp x.XXXXXX)
 export x_history_file=~/.x
 
 ###################################################################################
