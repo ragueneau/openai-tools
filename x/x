@@ -56,7 +56,7 @@ x_main() {
     local command="$(x_query_openai "$request")"
 
     # show the command
-    echo -e "\e[1;37m"${command}"\e[0m"
+    echo -e "${command}"
 
     read -p "[E]xecute or [r]etry? [e/r/N] " -n 1 -r
     echo
@@ -336,22 +336,22 @@ x_show_token_usage() {
 
     local stats=$(x_get_tokens_stats)
 
-    echo -e "\e[1;37mTotal requests\e[0m: $(echo $stats|jq '.total_requests'|tr -d '"')"
-    echo -e "\e[4;1;34mPrompt\e[0m:"
-    echo -e "\e[1;37mTotal tokens\e[0m: $(echo $stats|jq '.prompt.total_tokens'|tr -d '"')"
-    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.prompt.average_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.prompt.min_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.prompt.max_tokens'|tr -d '"')"
-    echo -e "\e[4;1;34mCompletion\e[0m:"
-    echo -e "\e[1;37mTotal tokens\e[0m: $(echo $stats|jq '.completion.total_tokens'|tr -d '"')"
-    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.completion.average_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.completion.min_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.completion.max_tokens'|tr -d '"')"
-    echo -e "\e[4;1;34mTotal\e[0m:"
-    echo -e "\e[1;37mTotal tokens used\e[0m: $(echo $stats|jq '.total.total_tokens'|tr -d '"')"
-    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.total.average_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.total.min_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.total.max_tokens'|tr -d '"')"
+    echo -e "Total requests: $(echo $stats|jq '.total_requests'|tr -d '"')"
+    echo -e "Prompt:"
+    echo -e "Total tokens: $(echo $stats|jq '.prompt.total_tokens'|tr -d '"')"
+    echo -e "Average tokens: $(echo $stats|jq '.prompt.average_tokens'|tr -d '"')"
+    echo -e "Minimun tokens: $(echo $stats|jq '.prompt.min_tokens'|tr -d '"')"
+    echo -e "Maximun tokens: $(echo $stats|jq '.prompt.max_tokens'|tr -d '"')"
+    echo -e "Completion:"
+    echo -e "Total tokens: $(echo $stats|jq '.completion.total_tokens'|tr -d '"')"
+    echo -e "Average tokens: $(echo $stats|jq '.completion.average_tokens'|tr -d '"')"
+    echo -e "Minimun tokens: $(echo $stats|jq '.completion.min_tokens'|tr -d '"')"
+    echo -e "Maximun tokens: $(echo $stats|jq '.completion.max_tokens'|tr -d '"')"
+    echo -e "Total:"
+    echo -e "Total tokens used: $(echo $stats|jq '.total.total_tokens'|tr -d '"')"
+    echo -e "Average tokens: $(echo $stats|jq '.total.average_tokens'|tr -d '"')"
+    echo -e "Minimun tokens: $(echo $stats|jq '.total.min_tokens'|tr -d '"')"
+    echo -e "Maximun tokens: $(echo $stats|jq '.total.max_tokens'|tr -d '"')"
 }
 
 x_show_total_token() {
@@ -379,22 +379,22 @@ x_show_token_usage() {
 
     local stats=$(x_get_tokens_stats)
 
-    echo -e "\e[1;37mTotal requests\e[0m: $(echo $stats|jq '.total_requests'|tr -d '"')"
-    echo -e "\e[4;1;34mPrompt\e[0m:"
-    echo -e "\e[1;37mTotal tokens\e[0m: $(echo $stats|jq '.prompt.total_tokens'|tr -d '"')"
-    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.prompt.average_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.prompt.min_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.prompt.max_tokens'|tr -d '"')"
-    echo -e "\e[4;1;34mCompletion\e[0m:"
-    echo -e "\e[1;37mTotal tokens\e[0m: $(echo $stats|jq '.completion.total_tokens'|tr -d '"')"
-    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.completion.average_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.completion.min_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.completion.max_tokens'|tr -d '"')"
-    echo -e "\e[4;1;34mTotal\e[0m:"
-    echo -e "\e[1;37mTotal tokens used\e[0m: $(echo $stats|jq '.total.total_tokens'|tr -d '"')"
-    echo -e "\e[1;37mAverage tokens\e[0m: $(echo $stats|jq '.total.average_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMinimun tokens\e[0m: $(echo $stats|jq '.total.min_tokens'|tr -d '"')"
-    echo -e "\e[1;37mMaximun tokens\e[0m: $(echo $stats|jq '.total.max_tokens'|tr -d '"')"
+    echo -e "Total requests: $(echo $stats|jq '.total_requests'|tr -d '"')"
+    echo -e "Prompt:"
+    echo -e "Total tokens: $(echo $stats|jq '.prompt.total_tokens'|tr -d '"')"
+    echo -e "Average tokens: $(echo $stats|jq '.prompt.average_tokens'|tr -d '"')"
+    echo -e "Minimun tokens: $(echo $stats|jq '.prompt.min_tokens'|tr -d '"')"
+    echo -e "Maximun tokens: $(echo $stats|jq '.prompt.max_tokens'|tr -d '"')"
+    echo -e "Completion:"
+    echo -e "Total tokens: $(echo $stats|jq '.completion.total_tokens'|tr -d '"')"
+    echo -e "Average tokens: $(echo $stats|jq '.completion.average_tokens'|tr -d '"')"
+    echo -e "Minimun tokens: $(echo $stats|jq '.completion.min_tokens'|tr -d '"')"
+    echo -e "Maximun tokens: $(echo $stats|jq '.completion.max_tokens'|tr -d '"')"
+    echo -e "Total:"
+    echo -e "Total tokens used: $(echo $stats|jq '.total.total_tokens'|tr -d '"')"
+    echo -e "Average tokens: $(echo $stats|jq '.total.average_tokens'|tr -d '"')"
+    echo -e "Minimun tokens: $(echo $stats|jq '.total.min_tokens'|tr -d '"')"
+    echo -e "Maximun tokens: $(echo $stats|jq '.total.max_tokens'|tr -d '"')"
 }
 
 x_show_version() {
