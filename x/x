@@ -107,7 +107,7 @@ x_get_opts() {
                 shift
                 local request="$prompt: $@"
                 local command="$(x_query_openai "$request")"
-                echo -e "\e[1;37m"${command}"\e[0m"
+                echo "${command}"
                 x_execute_command "$command"
                 exit 0
                 ;;
