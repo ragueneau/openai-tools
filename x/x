@@ -30,7 +30,7 @@ if [ -z "$OPENAI_API_KEY" ]; then
 fi
 
 export prompt="Translate this into a Bash one-liner"
-export model="text-davinci-002"
+export model="text-davinci-003"
 export temperature=0.7
 export max_tokens=60
 
