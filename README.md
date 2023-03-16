@@ -1,6 +1,6 @@
 # OpenAI Tools
 
-This repository contains a collection of tools to interact with the OpenAI API.
+This repository contains a collection of tools to interact with and learn the OpenAI API.
 
 ## Tools
 
