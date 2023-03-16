@@ -413,10 +413,17 @@ x_query_openai() {
     local query=$@
 
     # make sure the question ends with a dot
-    [[ $query != *"."$ ]] && request="$request."
+    [[ $query != *"."$ ]] && query="$query."
+
+    local payload=$(jq -n \
+        --arg model "$model" \
+        --arg prompt "$query" \
+        --arg temperature "$temperature" \
+        --arg max_tokens "$max_tokens" \
+        '{"model": $model, "prompt": $prompt, "temperature": $temperature|tonumber, "max_tokens": $max_tokens|tonumber}')
 
     curl -q -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $OPENAI_API_KEY" \
-        -d '{"model": "'$model'", "prompt": "'"$request"'", "temperature": '$temperature', "max_tokens": '$max_tokens'}' \
+        -d  "$payload" \
         -o $tmp_output_file https://api.openai.com/v1/completions > /dev/null 2>&1
 
     # add the command to the x history
